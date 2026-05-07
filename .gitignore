@@ -1,0 +1,17 @@
+# Vim swap files
+*.swp
+*.swo
+*~
+
+# Bash
+*.bash_history
+.bash_profile
+
+# Editor
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+.directory
