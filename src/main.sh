@@ -33,7 +33,7 @@ process_containers() {
     [[ -z "$container_id" ]] && continue
 
     log_info "Processing container: $container_id"
-    update_container "$container_id"
+    update_container "$container_id" || true
   done <<< "$containers"
 }
 
