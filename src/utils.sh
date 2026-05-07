@@ -2,8 +2,23 @@
 
 get_containers_by_tag() {
   local tag="$1"
-  pct list --format json 2>/dev/null | \
-    jq -r ".[] | select((.tags // \"\") | contains(\"$tag\")) | .vmid" 2>/dev/null
+  local lxc_dir="/etc/pve/lxc"
+
+  if [[ ! -d "$lxc_dir" ]]; then
+    log_error "LXC config directory not found: $lxc_dir"
+    return 1
+  fi
+
+  for config_file in "$lxc_dir"/*.conf; do
+    [[ -f "$config_file" ]] || continue
+
+    local vmid=$(basename "$config_file" .conf)
+    local tags=$(grep "^tags:" "$config_file" 2>/dev/null | cut -d: -f2)
+
+    if [[ -n "$tags" && "$tags" == *"$tag"* ]]; then
+      echo "$vmid"
+    fi
+  done
 }
 
 container_status() {
