@@ -40,13 +40,8 @@ process_containers() {
 update_container() {
   local container_id="$1"
 
-  if ! container_exists "$container_id"; then
-    log_warn "Container '$container_id' does not exist"
-    return 1
-  fi
-
   if ! is_container_running "$container_id"; then
-    log_warn "Container '$container_id' is not running"
+    log_warn "Container '$container_id' does not exist or is not running"
     return 1
   fi
 
@@ -56,11 +51,7 @@ update_container() {
     return 1
   }
 
-  log_info "Checking for updates on container $container_id..."
-  local updates=$(pct exec "$container_id" -- apt list --upgradable 2>/dev/null | grep -c "^" || echo "0")
-
-  if [[ $updates -gt 0 ]]; then
-    log_info "Found $updates packages to upgrade on container $container_id"
+  if pct exec "$container_id" -- apt list --upgradable 2>/dev/null | grep -q "^"; then
     log_info "Running apt full-upgrade on container $container_id..."
     pct exec "$container_id" -- DEBIAN_FRONTEND=noninteractive apt full-upgrade -y || {
       log_error "apt full-upgrade failed on container $container_id"
