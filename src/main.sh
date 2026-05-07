@@ -53,7 +53,7 @@ update_container() {
 
   if pct exec "$container_id" -- apt list --upgradable 2>/dev/null | grep -q "^"; then
     log_info "Running apt full-upgrade on container $container_id..."
-    pct exec "$container_id" -- DEBIAN_FRONTEND=noninteractive apt full-upgrade -y || {
+    pct exec "$container_id" -- sh -c "DEBIAN_FRONTEND=noninteractive apt full-upgrade -y" || {
       log_error "apt full-upgrade failed on container $container_id"
       return 1
     }
